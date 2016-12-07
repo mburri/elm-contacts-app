@@ -1,7 +1,8 @@
 module Main exposing (..)
 
-import Html exposing (Html, button, div, text, h1, ul, li)
+import Html exposing (Html, button, div, text, h1, table, tbody, td, tr)
 import Html.Events exposing (onClick)
+import Debug
 
 
 main =
@@ -18,7 +19,8 @@ main =
 
 
 type alias Contact =
-    { firstname : String
+    { id : Int
+    , firstname : String
     , lastname : String
     , phone : String
     }
@@ -26,17 +28,20 @@ type alias Contact =
 
 type alias Model =
     { contacts : List Contact
+    , selectedContact : Maybe Contact
     }
 
 
 type Msg
     = NoOp
     | AddContact
+    | Cancel
+    | SelectContact Contact
 
 
 init : ( Model, Cmd Msg )
 init =
-    ( { contacts = initContacts }
+    ( { contacts = initContacts, selectedContact = Nothing }
     , Cmd.none
     )
 
@@ -52,6 +57,12 @@ update msg model =
 
         AddContact ->
             model ! []
+
+        Cancel ->
+            { model | selectedContact = Nothing } ! []
+
+        SelectContact contact ->
+            ( { model | selectedContact = Just contact }, Cmd.none )
 
 
 
@@ -71,21 +82,44 @@ view : Model -> Html Msg
 view model =
     div []
         [ h1 [] [ text "Contacts" ]
+        , viewSelectedContact model.selectedContact
         , button [ onClick AddContact ] [ text "Add" ]
+        , button [ onClick Cancel ] [ text "Cancel" ]
         , (viewContacts model.contacts)
         ]
 
 
+viewSelectedContact : Maybe Contact -> Html Msg
+viewSelectedContact contact =
+    case contact of
+        Nothing ->
+            text ""
+
+        Just c ->
+            div []
+                [ text "selected contact"
+                , toString contact |> text
+                ]
+
+
 viewContacts : List Contact -> Html Msg
 viewContacts contacts =
-    ul []
-        (List.map viewContact contacts)
+    table []
+        [ tbody []
+            (List.map viewContact contacts)
+        ]
 
 
 viewContact : Contact -> Html Msg
 viewContact contact =
-    --li [] [ text (contact.firstname ++ ", " ++ contact.lastname ++ ", " ++ contact.phone) ]
-    li [] [ toString contact |> text ]
+    tr [ onClick <| SelectContact contact ]
+        [ td []
+            [ text contact.firstname ]
+        , td []
+            [ text contact.lastname ]
+        , td []
+            [ text contact.phone ]
+        ]
 
 
 
@@ -94,8 +128,8 @@ viewContact contact =
 
 initContacts : List Contact
 initContacts =
-    [ { firstname = "Yvonne", lastname = "Gerardo", phone = "632-606-7173" }
-    , { firstname = "Lois", lastname = "Liana", phone = "543-555-7743" }
-    , { firstname = "Vladimir", lastname = "Ward", phone = "123-344-7145" }
-    , { firstname = "Trace", lastname = "Route", phone = "631-406-5473" }
+    [ { id = 1, firstname = "Yvonne", lastname = "Gerardo", phone = "632-606-7173" }
+    , { id = 2, firstname = "Lois", lastname = "Liana", phone = "543-555-7743" }
+    , { id = 3, firstname = "Vladimir", lastname = "Ward", phone = "123-344-7145" }
+    , { id = 4, firstname = "Trace", lastname = "Route", phone = "631-406-5473" }
     ]
