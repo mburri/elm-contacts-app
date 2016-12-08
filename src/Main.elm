@@ -42,8 +42,9 @@ type Field
 type Msg
     = NoOp
     | AddContact
+    | SaveContact
     | Cancel
-    | SelectContact Contact
+    | Select Contact
     | Change Field String
 
 
@@ -58,6 +59,7 @@ init =
 -- UPDATE
 
 
+update : Msg -> Model -> ( Model, Cmd Msg )
 update msg model =
     case msg of
         NoOp ->
@@ -66,18 +68,30 @@ update msg model =
         AddContact ->
             model ! []
 
+        SaveContact ->
+            case model.selectedContact of
+                Nothing ->
+                    model ! []
+
+                Just contact ->
+                    let
+                        contacts =
+                            saveContact model.contacts contact
+                    in
+                        { model | contacts = contacts, selectedContact = Nothing } ! []
+
         Cancel ->
             { model | selectedContact = Nothing } ! []
 
-        SelectContact contact ->
+        Select contact ->
             ( { model | selectedContact = Just contact }, Cmd.none )
 
         Change field value ->
             case field of
                 Firstname ->
                     (updateSelectedContact
-                        (\contact ->
-                            { contact | firstname = value }
+                        (\c ->
+                            { c | firstname = value }
                         )
                         model
                     )
@@ -85,8 +99,8 @@ update msg model =
 
                 Lastname ->
                     (updateSelectedContact
-                        (\contact ->
-                            { contact | lastname = value }
+                        (\c ->
+                            { c | lastname = value }
                         )
                         model
                     )
@@ -94,12 +108,24 @@ update msg model =
 
                 Phone ->
                     (updateSelectedContact
-                        (\contact ->
-                            { contact | phone = value }
+                        (\c ->
+                            { c | phone = value }
                         )
                         model
                     )
                         ! []
+
+
+saveContact : List Contact -> Contact -> List Contact
+saveContact contacts newContact =
+    let
+        replace contact =
+            if contact.id == newContact.id then
+                newContact
+            else
+                contact
+    in
+        List.map (replace) contacts
 
 
 updateSelectedContact : (Contact -> Contact) -> Model -> Model
@@ -154,6 +180,7 @@ viewContactPanel contact =
         Just c ->
             div [ class "contact-panel" ]
                 [ viewInput c
+                , button [ onClick SaveContact ] [ text "Save" ]
                 , button [ onClick Cancel ] [ text "Cancel" ]
                 ]
 
@@ -195,7 +222,7 @@ viewContacts contacts =
 
 viewContact : Contact -> Html Msg
 viewContact contact =
-    tr [ onClick <| SelectContact contact ]
+    tr [ onClick <| Select contact ]
         [ td []
             [ text contact.firstname ]
         , td []
