@@ -15,3 +15,7 @@ no prerequisites - elm and elm-live server are defined as devDependencies for np
 * run ```npm install```
 * run ```npm run dev```
 * open http://localhost:8000
+
+A json-server is used for the backend - run it with
+
+```npm run api```
