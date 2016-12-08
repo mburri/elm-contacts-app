@@ -5,6 +5,7 @@ import Html.Attributes exposing (value, class, type_)
 import Html.Events exposing (onClick, onInput)
 import Http
 import Json.Decode as Decode
+import Json.Encode as Encode
 import Debug
 
 
@@ -53,7 +54,7 @@ type Msg
 
 init : ( Model, Cmd Msg )
 init =
-    ( { contacts = initContacts, selectedContact = Nothing }
+    ( { contacts = [], selectedContact = Nothing }
     , loadContacts
     )
 
@@ -82,11 +83,12 @@ update msg model =
                     model ! []
 
                 Just contact ->
-                    let
-                        contacts =
-                            saveContact model.contacts contact
-                    in
-                        { model | contacts = contacts, selectedContact = Nothing } ! []
+                    case contact.id of
+                        Nothing ->
+                            postContact contact model
+
+                        Just id ->
+                            putContact id contact model
 
         Cancel ->
             { model | selectedContact = Nothing } ! []
@@ -173,6 +175,29 @@ loadContacts =
 getContacts : Http.Request (List Contact)
 getContacts =
     Http.get "http://localhost:3030/contacts" decodeContacts
+
+
+contactToJson : Contact -> String
+contactToJson contact =
+    let
+        contactObject =
+            Encode.object
+                [ ( "first_name", Encode.string contact.firstname )
+                , ( "last_name", Encode.string contact.lastname )
+                , ( "phone", Encode.string contact.phone )
+                ]
+    in
+        Encode.encode 0 contactObject
+
+
+putContact : Int -> Contact -> Model -> ( Model, Cmd Msg )
+putContact id contact model =
+    model ! []
+
+
+postContact : Contact -> Model -> ( Model, Cmd Msg )
+postContact contact model =
+    model ! []
 
 
 decodeContacts : Decode.Decoder (List Contact)
@@ -282,16 +307,3 @@ viewContact contact =
         , td []
             [ text contact.phone ]
         ]
-
-
-
--- Helpers
-
-
-initContacts : List Contact
-initContacts =
-    [ { id = Just 1, firstname = "Yvonne", lastname = "Gerardo", phone = "632-606-7173" }
-    , { id = Just 2, firstname = "Lois", lastname = "Liana", phone = "543-555-7743" }
-    , { id = Just 3, firstname = "Vladimir", lastname = "Ward", phone = "123-344-7145" }
-    , { id = Just 4, firstname = "Trace", lastname = "Route", phone = "631-406-5473" }
-    ]
