@@ -75,55 +75,40 @@ update msg model =
         Change field value ->
             case field of
                 Firstname ->
-                    (updateFirstname value model) ! []
+                    (updateSelectedContact
+                        (\contact ->
+                            { contact | firstname = value }
+                        )
+                        model
+                    )
+                        ! []
 
                 Lastname ->
-                    (updateLastname value model) ! []
+                    (updateSelectedContact
+                        (\contact ->
+                            { contact | lastname = value }
+                        )
+                        model
+                    )
+                        ! []
 
                 Phone ->
-                    (updatePhone value model) ! []
+                    (updateSelectedContact
+                        (\contact ->
+                            { contact | phone = value }
+                        )
+                        model
+                    )
+                        ! []
 
 
-updateLastname : String -> Model -> Model
-updateLastname lastname model =
+updateSelectedContact : (Contact -> Contact) -> Model -> Model
+updateSelectedContact updateFunction model =
     let
-        contact =
-            case model.selectedContact of
-                Nothing ->
-                    Nothing
-
-                Just c ->
-                    Just { c | lastname = lastname }
+        updatedContact =
+            Maybe.map (updateFunction)
     in
-        { model | selectedContact = contact }
-
-
-updateFirstname : String -> Model -> Model
-updateFirstname firstname model =
-    let
-        contact =
-            case model.selectedContact of
-                Nothing ->
-                    Nothing
-
-                Just c ->
-                    Just { c | firstname = firstname }
-    in
-        { model | selectedContact = contact }
-
-
-updatePhone : String -> Model -> Model
-updatePhone phone model =
-    let
-        contact =
-            case model.selectedContact of
-                Nothing ->
-                    Nothing
-
-                Just c ->
-                    Just { c | phone = phone }
-    in
-        { model | selectedContact = contact }
+        { model | selectedContact = updatedContact model.selectedContact }
 
 
 
@@ -168,7 +153,9 @@ viewContactPanel contact =
 
         Just c ->
             div [ class "contact-panel" ]
-                [ viewInput c ]
+                [ viewInput c
+                , button [ onClick Cancel ] [ text "Cancel" ]
+                ]
 
 
 viewInput : Contact -> Html Msg
