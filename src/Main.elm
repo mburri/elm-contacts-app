@@ -20,7 +20,7 @@ main =
 
 
 type alias Contact =
-    { id : Int
+    { id : Maybe Int
     , firstname : String
     , lastname : String
     , phone : String
@@ -238,8 +238,8 @@ viewContact contact =
 
 initContacts : List Contact
 initContacts =
-    [ { id = 1, firstname = "Yvonne", lastname = "Gerardo", phone = "632-606-7173" }
-    , { id = 2, firstname = "Lois", lastname = "Liana", phone = "543-555-7743" }
-    , { id = 3, firstname = "Vladimir", lastname = "Ward", phone = "123-344-7145" }
-    , { id = 4, firstname = "Trace", lastname = "Route", phone = "631-406-5473" }
+    [ { id = Just 1, firstname = "Yvonne", lastname = "Gerardo", phone = "632-606-7173" }
+    , { id = Just 2, firstname = "Lois", lastname = "Liana", phone = "543-555-7743" }
+    , { id = Just 3, firstname = "Vladimir", lastname = "Ward", phone = "123-344-7145" }
+    , { id = Just 4, firstname = "Trace", lastname = "Route", phone = "631-406-5473" }
     ]
