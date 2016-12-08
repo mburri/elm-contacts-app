@@ -3,6 +3,8 @@ module Main exposing (..)
 import Html exposing (..)
 import Html.Attributes exposing (value, class, type_)
 import Html.Events exposing (onClick, onInput)
+import Http
+import Json.Decode as Decode
 import Debug
 
 
@@ -46,13 +48,19 @@ type Msg
     | Cancel
     | Select Contact
     | Change Field String
+    | LoadContacts (Result Http.Error (List Contact))
 
 
 init : ( Model, Cmd Msg )
 init =
     ( { contacts = initContacts, selectedContact = Nothing }
-    , Cmd.none
+    , loadContacts
     )
+
+
+newContact : Contact
+newContact =
+    Contact Nothing "" "" ""
 
 
 
@@ -66,7 +74,7 @@ update msg model =
             model ! []
 
         AddContact ->
-            model ! []
+            { model | selectedContact = Just newContact } ! []
 
         SaveContact ->
             case model.selectedContact of
@@ -115,17 +123,37 @@ update msg model =
                     )
                         ! []
 
+        LoadContacts (Ok contacts) ->
+            { model | contacts = contacts } ! []
+
+        LoadContacts (Err _) ->
+            ( model, Cmd.none )
+
 
 saveContact : List Contact -> Contact -> List Contact
 saveContact contacts newContact =
+    case newContact.id of
+        Nothing ->
+            addContact contacts newContact
+
+        Just id ->
+            let
+                replace contact =
+                    if contact.id == newContact.id then
+                        newContact
+                    else
+                        contact
+            in
+                List.map (replace) contacts
+
+
+addContact : List Contact -> Contact -> List Contact
+addContact contacts newContact =
     let
-        replace contact =
-            if contact.id == newContact.id then
-                newContact
-            else
-                contact
+        nextId =
+            Just 6
     in
-        List.map (replace) contacts
+        { newContact | id = nextId } :: contacts
 
 
 updateSelectedContact : (Contact -> Contact) -> Model -> Model
@@ -135,6 +163,30 @@ updateSelectedContact updateFunction model =
             Maybe.map (updateFunction)
     in
         { model | selectedContact = updatedContact model.selectedContact }
+
+
+loadContacts : Cmd Msg
+loadContacts =
+    Http.send LoadContacts getContacts
+
+
+getContacts : Http.Request (List Contact)
+getContacts =
+    Http.get "http://localhost:3030/contacts" decodeContacts
+
+
+decodeContacts : Decode.Decoder (List Contact)
+decodeContacts =
+    Decode.list decodeContact
+
+
+decodeContact : Decode.Decoder Contact
+decodeContact =
+    Decode.map4 Contact
+        (Decode.nullable (Decode.field "id" Decode.int))
+        (Decode.field "first_name" Decode.string)
+        (Decode.field "last_name" Decode.string)
+        (Decode.field "phone" Decode.string)
 
 
 
