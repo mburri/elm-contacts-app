@@ -9,7 +9,12 @@
     "elm-live": "^2.6.0"
   },
   "scripts": {
-    "dev": "elm-live src/Main.elm --open --dir=dist/ --path-to-elm-make=node_modules/.bin/elm-make -- --output dist/index.html --debug "
+    "dev": "elm-live src/Main.elm --open --path-to-elm-make=node_modules/.bin/elm-make -- --output elm.js --debug "
+  },
+
+  "dependencies": {
+    "milligram": "^1.1.0",
+    "normalize.css": "^5.0.0"
   },
   "keywords": [],
   "author": "",

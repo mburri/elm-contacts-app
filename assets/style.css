@@ -1,0 +1,22 @@
+.contact-panel {
+  display: block;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: 600px;
+  overflow: hidden auto;
+  background-color: #efefef;
+  -webkit-box-shadow: -3px 0px 5px 0px rgba(0,0,0,0.3);
+  -moz-box-shadow: -3px 0px 5px 0px rgba(0,0,0,0.3);
+  box-shadow: -3px 0px 5px 0px rgba(0,0,0,0.3);
+}
+
+td > a {
+  display: block;
+  color: #606c76;
+}
+
+a {
+  cursor: pointer;
+}

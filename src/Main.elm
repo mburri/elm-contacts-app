@@ -1,7 +1,8 @@
 module Main exposing (..)
 
-import Html exposing (Html, button, div, text, h1, table, tbody, td, tr)
-import Html.Events exposing (onClick)
+import Html exposing (..)
+import Html.Attributes exposing (value, class, type_)
+import Html.Events exposing (onClick, onInput)
 import Debug
 
 
@@ -32,11 +33,18 @@ type alias Model =
     }
 
 
+type Field
+    = Firstname
+    | Lastname
+    | Phone
+
+
 type Msg
     = NoOp
     | AddContact
     | Cancel
     | SelectContact Contact
+    | Change Field String
 
 
 init : ( Model, Cmd Msg )
@@ -64,6 +72,59 @@ update msg model =
         SelectContact contact ->
             ( { model | selectedContact = Just contact }, Cmd.none )
 
+        Change field value ->
+            case field of
+                Firstname ->
+                    (updateFirstname value model) ! []
+
+                Lastname ->
+                    (updateLastname value model) ! []
+
+                Phone ->
+                    (updatePhone value model) ! []
+
+
+updateLastname : String -> Model -> Model
+updateLastname lastname model =
+    let
+        contact =
+            case model.selectedContact of
+                Nothing ->
+                    Nothing
+
+                Just c ->
+                    Just { c | lastname = lastname }
+    in
+        { model | selectedContact = contact }
+
+
+updateFirstname : String -> Model -> Model
+updateFirstname firstname model =
+    let
+        contact =
+            case model.selectedContact of
+                Nothing ->
+                    Nothing
+
+                Just c ->
+                    Just { c | firstname = firstname }
+    in
+        { model | selectedContact = contact }
+
+
+updatePhone : String -> Model -> Model
+updatePhone phone model =
+    let
+        contact =
+            case model.selectedContact of
+                Nothing ->
+                    Nothing
+
+                Just c ->
+                    Just { c | phone = phone }
+    in
+        { model | selectedContact = contact }
+
 
 
 -- SUBSCRIPTIONS
@@ -80,26 +141,61 @@ subscriptions model =
 
 view : Model -> Html Msg
 view model =
-    div []
-        [ h1 [] [ text "Contacts" ]
-        , viewSelectedContact model.selectedContact
-        , button [ onClick AddContact ] [ text "Add" ]
-        , button [ onClick Cancel ] [ text "Cancel" ]
+    div [ class "container" ]
+        [ div [ class "row " ] [ h1 [] [ text "Contacts" ] ]
+        , viewContactPanel model.selectedContact
+        , viewToolbar
         , (viewContacts model.contacts)
         ]
 
 
-viewSelectedContact : Maybe Contact -> Html Msg
-viewSelectedContact contact =
+viewToolbar : Html Msg
+viewToolbar =
+    div [ class "row" ]
+        [ button
+            [ class "button button-outline"
+            , onClick AddContact
+            ]
+            [ text "Add" ]
+        ]
+
+
+viewContactPanel : Maybe Contact -> Html Msg
+viewContactPanel contact =
     case contact of
         Nothing ->
             text ""
 
         Just c ->
-            div []
-                [ text "selected contact"
-                , toString contact |> text
-                ]
+            div [ class "contact-panel" ]
+                [ viewInput c ]
+
+
+viewInput : Contact -> Html Msg
+viewInput contact =
+    fieldset []
+        [ label [] [ text "First name" ]
+        , input
+            [ type_ "text"
+            , onInput (Change Firstname)
+            , value contact.firstname
+            ]
+            []
+        , label [] [ text "Last name" ]
+        , input
+            [ type_ "text"
+            , value contact.lastname
+            , onInput (Change Lastname)
+            ]
+            []
+        , label [] [ text "Phone" ]
+        , input
+            [ type_ "text"
+            , onInput (Change Phone)
+            , value contact.phone
+            ]
+            []
+        ]
 
 
 viewContacts : List Contact -> Html Msg
