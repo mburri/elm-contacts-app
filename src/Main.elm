@@ -4,6 +4,7 @@ import Html exposing (..)
 import Html.Attributes exposing (value, class, type_)
 import Html.Events exposing (onClick, onInput)
 import Http
+import HttpBuilder
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Debug
@@ -50,6 +51,9 @@ type Msg
     | Select Contact
     | Change Field String
     | LoadContacts (Result Http.Error (List Contact))
+    | ContactPosted (Result Http.Error Contact)
+    | ContactPutSucced
+    | ContactPutFailed
 
 
 init : ( Model, Cmd Msg )
@@ -88,7 +92,7 @@ update msg model =
                             postContact contact model
 
                         Just id ->
-                            putContact id contact model
+                            ( model, putContact id contact )
 
         Cancel ->
             { model | selectedContact = Nothing } ! []
@@ -130,6 +134,22 @@ update msg model =
 
         LoadContacts (Err _) ->
             ( model, Cmd.none )
+
+        ContactPosted (Ok contact) ->
+            { model
+                | selectedContact = Nothing
+                , contacts = contact :: model.contacts
+            }
+                ! []
+
+        ContactPosted (Err _) ->
+            model ! []
+
+        ContactPutSucced ->
+            ( { model | selectedContact = Nothing }, loadContacts )
+
+        ContactPutFailed ->
+            model ! []
 
 
 saveContact : List Contact -> Contact -> List Contact
@@ -177,27 +197,45 @@ getContacts =
     Http.get "http://localhost:3030/contacts" decodeContacts
 
 
-contactToJson : Contact -> String
+contactToJson : Contact -> Encode.Value
 contactToJson contact =
+    Encode.object
+        [ ( "first_name", Encode.string contact.firstname )
+        , ( "last_name", Encode.string contact.lastname )
+        , ( "phone", Encode.string contact.phone )
+        ]
+
+
+putContact : Int -> Contact -> Cmd Msg
+putContact id contact =
     let
-        contactObject =
-            Encode.object
-                [ ( "first_name", Encode.string contact.firstname )
-                , ( "last_name", Encode.string contact.lastname )
-                , ( "phone", Encode.string contact.phone )
-                ]
+        url =
+            "http://localhost:3030/contacts/" ++ (toString id)
     in
-        Encode.encode 0 contactObject
+        HttpBuilder.put url
+            |> HttpBuilder.withJsonBody (contactToJson contact)
+            |> HttpBuilder.withExpect (Http.expectJson decodeContact)
+            |> HttpBuilder.send handlePutContactRequestComplete
 
 
-putContact : Int -> Contact -> Model -> ( Model, Cmd Msg )
-putContact id contact model =
-    model ! []
+handlePutContactRequestComplete : Result Http.Error Contact -> Msg
+handlePutContactRequestComplete result =
+    case result of
+        Ok contact ->
+            ContactPutSucced
+
+        Err _ ->
+            ContactPutFailed
 
 
 postContact : Contact -> Model -> ( Model, Cmd Msg )
 postContact contact model =
-    model ! []
+    ( model, Http.send ContactPosted (postContactRequest contact) )
+
+
+postContactRequest : Contact -> Http.Request Contact
+postContactRequest contact =
+    Http.post "http://localhost:3030/contacts" (Http.jsonBody (contactToJson contact)) decodeContact
 
 
 decodeContacts : Decode.Decoder (List Contact)
