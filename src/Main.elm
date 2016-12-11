@@ -5,9 +5,6 @@ import Html.Attributes exposing (value, class, type_)
 import Html.Events exposing (onClick, onInput)
 import Http
 import HttpBuilder
-import Json.Decode as Decode
-import Json.Encode as Encode
-import Debug
 import Contact exposing (Contact)
 
 
