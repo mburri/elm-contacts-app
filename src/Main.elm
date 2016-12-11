@@ -54,7 +54,7 @@ type Msg
 init : ( Model, Cmd Msg )
 init =
     ( { contacts = [], selectedContact = Nothing }
-    , loadContacts
+    , getContacts
     )
 
 
@@ -126,13 +126,13 @@ update msg model =
             model ! []
 
         PostContactSucceed ->
-            ( { model | selectedContact = Nothing }, loadContacts )
+            ( { model | selectedContact = Nothing }, getContacts )
 
         PostContactFailed ->
             model ! []
 
         PutContactSucceed ->
-            ( { model | selectedContact = Nothing }, loadContacts )
+            ( { model | selectedContact = Nothing }, getContacts )
 
         PutContactFailed ->
             model ! []
@@ -147,8 +147,8 @@ updateSelectedContact updateFunction model =
         { model | selectedContact = updatedContact model.selectedContact }
 
 
-loadContacts : Cmd Msg
-loadContacts =
+getContacts : Cmd Msg
+getContacts =
     let
         url =
             "http://localhost:3030/contacts"
