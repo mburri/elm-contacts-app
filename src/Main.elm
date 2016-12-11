@@ -50,7 +50,9 @@ type Msg
 
 init : ( Model, Cmd Msg )
 init =
-    ( { contacts = [], selectedContact = Nothing }
+    ( { contacts = []
+      , selectedContact = Nothing
+      }
     , getContacts
     )
 
@@ -69,52 +71,16 @@ update msg model =
             { model | selectedContact = Just Contact.empty } ! []
 
         SaveContact ->
-            case model.selectedContact of
-                Nothing ->
-                    model ! []
-
-                Just contact ->
-                    case contact.id of
-                        Nothing ->
-                            ( model, postContact contact )
-
-                        Just id ->
-                            ( model, putContact id contact )
+            saveContact model
 
         Cancel ->
             { model | selectedContact = Nothing } ! []
 
         Select contact ->
-            ( { model | selectedContact = Just contact }, Cmd.none )
+            { model | selectedContact = Just contact } ! []
 
         Change field value ->
-            case field of
-                Firstname ->
-                    (updateSelectedContact
-                        (\c ->
-                            { c | firstname = value }
-                        )
-                        model
-                    )
-                        ! []
-
-                Lastname ->
-                    (updateSelectedContact
-                        (\c ->
-                            { c | lastname = value }
-                        )
-                        model
-                    )
-                        ! []
-
-                Phone ->
-                    (updateSelectedContact
-                        (\c ->
-                            { c | phone = value }
-                        )
-                        model
-                    )
-                        ! []
+            changeInput field value model
 
         GetContactsSuccedd contacts ->
             ( { model | contacts = contacts }, Cmd.none )
@@ -142,6 +108,52 @@ updateSelectedContact updateFunction model =
             Maybe.map (updateFunction)
     in
         { model | selectedContact = updatedContact model.selectedContact }
+
+
+changeInput : Field -> String -> Model -> ( Model, Cmd Msg )
+changeInput field value model =
+    case field of
+        Firstname ->
+            (updateSelectedContact
+                (\c ->
+                    { c | firstname = value }
+                )
+                model
+            )
+                ! []
+
+        Lastname ->
+            (updateSelectedContact
+                (\c ->
+                    { c | lastname = value }
+                )
+                model
+            )
+                ! []
+
+        Phone ->
+            (updateSelectedContact
+                (\c ->
+                    { c | phone = value }
+                )
+                model
+            )
+                ! []
+
+
+saveContact : Model -> ( Model, Cmd Msg )
+saveContact model =
+    case model.selectedContact of
+        Nothing ->
+            model ! []
+
+        Just contact ->
+            case contact.id of
+                Nothing ->
+                    ( model, postContact contact )
+
+                Just id ->
+                    ( model, putContact id contact )
 
 
 getContacts : Cmd Msg
