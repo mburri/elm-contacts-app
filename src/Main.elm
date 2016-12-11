@@ -50,10 +50,12 @@ type Msg
     | Cancel
     | Select Contact
     | Change Field String
-    | LoadContacts (Result Http.Error (List Contact))
-    | ContactPosted (Result Http.Error Contact)
-    | ContactPutSucced
-    | ContactPutFailed
+    | GetContactsSuccedd (List Contact)
+    | GetContactsFailed
+    | PostContactSucceed
+    | PostContactFailed
+    | PutContactSucceed
+    | PutContactFailed
 
 
 init : ( Model, Cmd Msg )
@@ -89,7 +91,7 @@ update msg model =
                 Just contact ->
                     case contact.id of
                         Nothing ->
-                            postContact contact model
+                            ( model, postContact contact )
 
                         Just id ->
                             ( model, putContact id contact )
@@ -129,53 +131,23 @@ update msg model =
                     )
                         ! []
 
-        LoadContacts (Ok contacts) ->
-            { model | contacts = contacts } ! []
+        GetContactsSuccedd contacts ->
+            ( { model | contacts = contacts }, Cmd.none )
 
-        LoadContacts (Err _) ->
-            ( model, Cmd.none )
-
-        ContactPosted (Ok contact) ->
-            { model
-                | selectedContact = Nothing
-                , contacts = contact :: model.contacts
-            }
-                ! []
-
-        ContactPosted (Err _) ->
+        GetContactsFailed ->
             model ! []
 
-        ContactPutSucced ->
+        PostContactSucceed ->
             ( { model | selectedContact = Nothing }, loadContacts )
 
-        ContactPutFailed ->
+        PostContactFailed ->
             model ! []
 
+        PutContactSucceed ->
+            ( { model | selectedContact = Nothing }, loadContacts )
 
-saveContact : List Contact -> Contact -> List Contact
-saveContact contacts newContact =
-    case newContact.id of
-        Nothing ->
-            addContact contacts newContact
-
-        Just id ->
-            let
-                replace contact =
-                    if contact.id == newContact.id then
-                        newContact
-                    else
-                        contact
-            in
-                List.map (replace) contacts
-
-
-addContact : List Contact -> Contact -> List Contact
-addContact contacts newContact =
-    let
-        nextId =
-            Just 6
-    in
-        { newContact | id = nextId } :: contacts
+        PutContactFailed ->
+            model ! []
 
 
 updateSelectedContact : (Contact -> Contact) -> Model -> Model
@@ -189,16 +161,27 @@ updateSelectedContact updateFunction model =
 
 loadContacts : Cmd Msg
 loadContacts =
-    Http.send LoadContacts getContacts
+    let
+        url =
+            "http://localhost:3030/contacts"
+    in
+        HttpBuilder.get url
+            |> HttpBuilder.withExpect (Http.expectJson decodeContacts)
+            |> HttpBuilder.send handleGetContactsComplete
 
 
-getContacts : Http.Request (List Contact)
-getContacts =
-    Http.get "http://localhost:3030/contacts" decodeContacts
+handleGetContactsComplete : Result Http.Error (List Contact) -> Msg
+handleGetContactsComplete result =
+    case result of
+        Ok contacts ->
+            GetContactsSuccedd contacts
+
+        Err _ ->
+            GetContactsFailed
 
 
-contactToJson : Contact -> Encode.Value
-contactToJson contact =
+encodeContact : Contact -> Encode.Value
+encodeContact contact =
     Encode.object
         [ ( "first_name", Encode.string contact.firstname )
         , ( "last_name", Encode.string contact.lastname )
@@ -213,7 +196,7 @@ putContact id contact =
             "http://localhost:3030/contacts/" ++ (toString id)
     in
         HttpBuilder.put url
-            |> HttpBuilder.withJsonBody (contactToJson contact)
+            |> HttpBuilder.withJsonBody (encodeContact contact)
             |> HttpBuilder.withExpect (Http.expectJson decodeContact)
             |> HttpBuilder.send handlePutContactRequestComplete
 
@@ -222,20 +205,32 @@ handlePutContactRequestComplete : Result Http.Error Contact -> Msg
 handlePutContactRequestComplete result =
     case result of
         Ok contact ->
-            ContactPutSucced
+            PutContactSucceed
 
         Err _ ->
-            ContactPutFailed
+            PutContactFailed
 
 
-postContact : Contact -> Model -> ( Model, Cmd Msg )
-postContact contact model =
-    ( model, Http.send ContactPosted (postContactRequest contact) )
+postContact : Contact -> Cmd Msg
+postContact contact =
+    let
+        url =
+            "http://localhost:3030/contacts"
+    in
+        HttpBuilder.post url
+            |> HttpBuilder.withJsonBody (encodeContact contact)
+            |> HttpBuilder.withExpect (Http.expectJson decodeContact)
+            |> HttpBuilder.send handlePostContactComplete
 
 
-postContactRequest : Contact -> Http.Request Contact
-postContactRequest contact =
-    Http.post "http://localhost:3030/contacts" (Http.jsonBody (contactToJson contact)) decodeContact
+handlePostContactComplete : Result Http.Error Contact -> Msg
+handlePostContactComplete result =
+    case result of
+        Ok contact ->
+            PostContactSucceed
+
+        Err _ ->
+            PostContactFailed
 
 
 decodeContacts : Decode.Decoder (List Contact)
