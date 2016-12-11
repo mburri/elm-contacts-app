@@ -37,6 +37,7 @@ type Msg
     = NoOp
     | AddContact
     | SaveContact
+    | DeleteContact
     | Cancel
     | Select Contact
     | Change Field String
@@ -46,6 +47,8 @@ type Msg
     | PostContactFailed
     | PutContactSucceed
     | PutContactFailed
+    | DeleteContactSucceed
+    | DeleteContactFailed
 
 
 init : ( Model, Cmd Msg )
@@ -73,6 +76,9 @@ update msg model =
         SaveContact ->
             saveContact model
 
+        DeleteContact ->
+            deleteContact model
+
         Cancel ->
             { model | selectedContact = Nothing } ! []
 
@@ -98,6 +104,12 @@ update msg model =
             ( { model | selectedContact = Nothing }, getContacts )
 
         PutContactFailed ->
+            model ! []
+
+        DeleteContactSucceed ->
+            ( { model | selectedContact = Nothing }, getContacts )
+
+        DeleteContactFailed ->
             model ! []
 
 
@@ -154,6 +166,40 @@ saveContact model =
 
                 Just id ->
                     ( model, putContact id contact )
+
+
+deleteContact : Model -> ( Model, Cmd Msg )
+deleteContact model =
+    case model.selectedContact of
+        Nothing ->
+            model ! []
+
+        Just contact ->
+            case contact.id of
+                Nothing ->
+                    model ! []
+
+                Just id ->
+                    ( model, deleteContactRequest id )
+
+
+deleteContactRequest : Int -> Cmd Msg
+deleteContactRequest id =
+    let
+        url =
+            "http://localhost:3030/contacts/" ++ (toString id)
+    in
+        HttpBuilder.delete url
+            |> HttpBuilder.send handleDeleteContact
+
+
+handleDeleteContact result =
+    case result of
+        Ok _ ->
+            DeleteContactSucceed
+
+        Err _ ->
+            DeleteContactFailed
 
 
 getContacts : Cmd Msg
@@ -266,6 +312,7 @@ viewContactPanel contact =
                 [ viewInput c
                 , button [ onClick SaveContact ] [ text "Save" ]
                 , button [ onClick Cancel ] [ text "Cancel" ]
+                , button [ onClick DeleteContact ] [ text "Delete" ]
                 ]
 
 
