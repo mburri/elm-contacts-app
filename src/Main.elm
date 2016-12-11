@@ -8,6 +8,7 @@ import HttpBuilder
 import Json.Decode as Decode
 import Json.Encode as Encode
 import Debug
+import Contact exposing (Contact)
 
 
 main =
@@ -21,14 +22,6 @@ main =
 
 
 -- MODEL
-
-
-type alias Contact =
-    { id : Maybe Int
-    , firstname : String
-    , lastname : String
-    , phone : String
-    }
 
 
 type alias Model =
@@ -65,11 +58,6 @@ init =
     )
 
 
-newContact : Contact
-newContact =
-    Contact Nothing "" "" ""
-
-
 
 -- UPDATE
 
@@ -81,7 +69,7 @@ update msg model =
             model ! []
 
         AddContact ->
-            { model | selectedContact = Just newContact } ! []
+            { model | selectedContact = Just Contact.empty } ! []
 
         SaveContact ->
             case model.selectedContact of
@@ -166,7 +154,7 @@ loadContacts =
             "http://localhost:3030/contacts"
     in
         HttpBuilder.get url
-            |> HttpBuilder.withExpect (Http.expectJson decodeContacts)
+            |> HttpBuilder.withExpect (Http.expectJson Contact.decodeList)
             |> HttpBuilder.send handleGetContactsComplete
 
 
@@ -180,15 +168,6 @@ handleGetContactsComplete result =
             GetContactsFailed
 
 
-encodeContact : Contact -> Encode.Value
-encodeContact contact =
-    Encode.object
-        [ ( "first_name", Encode.string contact.firstname )
-        , ( "last_name", Encode.string contact.lastname )
-        , ( "phone", Encode.string contact.phone )
-        ]
-
-
 putContact : Int -> Contact -> Cmd Msg
 putContact id contact =
     let
@@ -196,8 +175,8 @@ putContact id contact =
             "http://localhost:3030/contacts/" ++ (toString id)
     in
         HttpBuilder.put url
-            |> HttpBuilder.withJsonBody (encodeContact contact)
-            |> HttpBuilder.withExpect (Http.expectJson decodeContact)
+            |> HttpBuilder.withJsonBody (Contact.encode contact)
+            |> HttpBuilder.withExpect (Http.expectJson Contact.decode)
             |> HttpBuilder.send handlePutContactRequestComplete
 
 
@@ -218,8 +197,8 @@ postContact contact =
             "http://localhost:3030/contacts"
     in
         HttpBuilder.post url
-            |> HttpBuilder.withJsonBody (encodeContact contact)
-            |> HttpBuilder.withExpect (Http.expectJson decodeContact)
+            |> HttpBuilder.withJsonBody (Contact.encode contact)
+            |> HttpBuilder.withExpect (Http.expectJson Contact.decode)
             |> HttpBuilder.send handlePostContactComplete
 
 
@@ -231,20 +210,6 @@ handlePostContactComplete result =
 
         Err _ ->
             PostContactFailed
-
-
-decodeContacts : Decode.Decoder (List Contact)
-decodeContacts =
-    Decode.list decodeContact
-
-
-decodeContact : Decode.Decoder Contact
-decodeContact =
-    Decode.map4 Contact
-        (Decode.nullable (Decode.field "id" Decode.int))
-        (Decode.field "first_name" Decode.string)
-        (Decode.field "last_name" Decode.string)
-        (Decode.field "phone" Decode.string)
 
 
 
