@@ -27,6 +27,19 @@ type alias Model =
     }
 
 
+init : ( Model, Cmd Msg )
+init =
+    ( { contacts = []
+      , selectedContact = Nothing
+      }
+    , getContacts
+    )
+
+
+
+-- UPDATE
+
+
 type Field
     = Firstname
     | Lastname
@@ -49,19 +62,6 @@ type Msg
     | PutContactFailed
     | DeleteContactSucceed
     | DeleteContactFailed
-
-
-init : ( Model, Cmd Msg )
-init =
-    ( { contacts = []
-      , selectedContact = Nothing
-      }
-    , getContacts
-    )
-
-
-
--- UPDATE
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
