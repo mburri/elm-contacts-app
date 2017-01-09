@@ -6,6 +6,7 @@ import Html.Events exposing (onClick, onInput)
 import Http
 import HttpBuilder
 import Contact exposing (Contact)
+import Model exposing (Model)
 
 
 main =
@@ -19,12 +20,6 @@ main =
 
 
 -- MODEL
-
-
-type alias Model =
-    { contacts : List Contact
-    , selectedContact : Maybe Contact
-    }
 
 
 init : ( Model, Cmd Msg )
