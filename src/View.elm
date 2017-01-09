@@ -1,62 +1,19 @@
 module View exposing (view)
 
-import Html exposing (..)
-import Html.Attributes exposing (value, class, type_)
-import Html.Events exposing (onClick, onInput)
-import Contact exposing (Contact)
+import Html exposing (Html, div, h1, text)
+import Html.Attributes exposing (class, type_)
 import Model exposing (Model)
 import Messages exposing (..)
 import View.Toolbar as Toolbar
 import View.ContactsList as ContactsList
+import View.ContactPanel as ContactPanel
 
 
 view : Model -> Html Msg
 view model =
     div [ class "container" ]
         [ div [ class "row " ] [ h1 [] [ text "Contacts" ] ]
-        , viewContactPanel model.selectedContact
+        , ContactPanel.view model.selectedContact
         , Toolbar.view { addMessage = AddContact }
         , (ContactsList.view model.contacts)
-        ]
-
-
-viewContactPanel : Maybe Contact -> Html Msg
-viewContactPanel contact =
-    case contact of
-        Nothing ->
-            text ""
-
-        Just c ->
-            div [ class "contact-panel" ]
-                [ viewInput c
-                , button [ onClick SaveContact ] [ text "Save" ]
-                , button [ onClick Cancel ] [ text "Cancel" ]
-                , button [ onClick DeleteContact ] [ text "Delete" ]
-                ]
-
-
-viewInput : Contact -> Html Msg
-viewInput contact =
-    fieldset []
-        [ label [] [ text "First name" ]
-        , input
-            [ type_ "text"
-            , onInput (Change Firstname)
-            , value contact.firstname
-            ]
-            []
-        , label [] [ text "Last name" ]
-        , input
-            [ type_ "text"
-            , value contact.lastname
-            , onInput (Change Lastname)
-            ]
-            []
-        , label [] [ text "Phone" ]
-        , input
-            [ type_ "text"
-            , onInput (Change Phone)
-            , value contact.phone
-            ]
-            []
         ]
