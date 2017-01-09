@@ -7,6 +7,7 @@ import Http
 import HttpBuilder
 import Contact exposing (Contact)
 import Model exposing (Model, init)
+import Messages exposing (..)
 
 
 main =
@@ -20,30 +21,6 @@ main =
 
 
 -- UPDATE
-
-
-type Field
-    = Firstname
-    | Lastname
-    | Phone
-
-
-type Msg
-    = NoOp
-    | AddContact
-    | SaveContact
-    | DeleteContact
-    | Cancel
-    | Select Contact
-    | Change Field String
-    | GetContactsSuccedd (List Contact)
-    | GetContactsFailed
-    | PostContactSucceed
-    | PostContactFailed
-    | PutContactSucceed
-    | PutContactFailed
-    | DeleteContactSucceed
-    | DeleteContactFailed
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
