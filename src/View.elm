@@ -4,9 +4,9 @@ import Html exposing (..)
 import Html.Attributes exposing (value, class, type_)
 import Html.Events exposing (onClick, onInput)
 import Contact exposing (Contact)
-import Contact exposing (Contact)
 import Model exposing (Model)
 import Messages exposing (..)
+import View.Toolbar as Toolbar
 
 
 view : Model -> Html Msg
@@ -14,19 +14,8 @@ view model =
     div [ class "container" ]
         [ div [ class "row " ] [ h1 [] [ text "Contacts" ] ]
         , viewContactPanel model.selectedContact
-        , viewToolbar
+        , Toolbar.view { addMessage = AddContact }
         , (viewContacts model.contacts)
-        ]
-
-
-viewToolbar : Html Msg
-viewToolbar =
-    div [ class "row" ]
-        [ button
-            [ class "button button-outline"
-            , onClick AddContact
-            ]
-            [ text "Add" ]
         ]
 
 
