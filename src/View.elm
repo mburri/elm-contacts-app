@@ -7,6 +7,7 @@ import Contact exposing (Contact)
 import Model exposing (Model)
 import Messages exposing (..)
 import View.Toolbar as Toolbar
+import View.ContactsList as ContactsList
 
 
 view : Model -> Html Msg
@@ -15,7 +16,7 @@ view model =
         [ div [ class "row " ] [ h1 [] [ text "Contacts" ] ]
         , viewContactPanel model.selectedContact
         , Toolbar.view { addMessage = AddContact }
-        , (viewContacts model.contacts)
+        , (ContactsList.view model.contacts)
         ]
 
 
@@ -58,24 +59,4 @@ viewInput contact =
             , value contact.phone
             ]
             []
-        ]
-
-
-viewContacts : List Contact -> Html Msg
-viewContacts contacts =
-    table []
-        [ tbody []
-            (List.map viewContact contacts)
-        ]
-
-
-viewContact : Contact -> Html Msg
-viewContact contact =
-    tr [ onClick <| Select contact ]
-        [ td []
-            [ text contact.firstname ]
-        , td []
-            [ text contact.lastname ]
-        , td []
-            [ text contact.phone ]
         ]
