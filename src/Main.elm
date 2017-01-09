@@ -6,29 +6,16 @@ import Html.Events exposing (onClick, onInput)
 import Http
 import HttpBuilder
 import Contact exposing (Contact)
-import Model exposing (Model)
+import Model exposing (Model, init)
 
 
 main =
     Html.program
-        { init = init
+        { init = init getContacts
         , view = view
         , update = update
         , subscriptions = subscriptions
         }
-
-
-
--- MODEL
-
-
-init : ( Model, Cmd Msg )
-init =
-    ( { contacts = []
-      , selectedContact = Nothing
-      }
-    , getContacts
-    )
 
 
 
