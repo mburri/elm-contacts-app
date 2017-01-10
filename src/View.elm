@@ -9,11 +9,16 @@ import View.ContactsList as ContactsList
 import View.ContactPanel as ContactPanel
 
 
+toolbarConfig : Toolbar.Config Msg
+toolbarConfig =
+    { addMessage = AddContact }
+
+
 view : Model -> Html Msg
 view model =
     div [ class "container" ]
         [ div [ class "row " ] [ h1 [] [ text "Contacts" ] ]
         , ContactPanel.view model.selectedContact
-        , Toolbar.view { addMessage = AddContact }
+        , Toolbar.view toolbarConfig
         , (ContactsList.view model.contacts)
         ]

@@ -1,11 +1,16 @@
-module View.Toolbar exposing (view)
+module View.Toolbar exposing (view, Config)
 
 import Html exposing (Html, div, button, text)
 import Html.Attributes exposing (value, class, type_)
 import Html.Events exposing (onClick, onInput)
 
 
-view : { addMessage : msg } -> Html msg
+type alias Config msg =
+    { addMessage : msg
+    }
+
+
+view : Config msg -> Html msg
 view config =
     div [ class "row" ]
         [ button
