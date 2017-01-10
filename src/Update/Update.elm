@@ -17,6 +17,9 @@ update msg model =
         AddContact ->
             { model | selectedContact = Just Contact.empty } ! []
 
+        Select contact ->
+            { model | selectedContact = Just contact } ! []
+
         SaveContact ->
             ContactRequests.saveContact model
 
@@ -25,9 +28,6 @@ update msg model =
 
         Cancel ->
             { model | selectedContact = Nothing } ! []
-
-        Select contact ->
-            { model | selectedContact = Just contact } ! []
 
         Change field value ->
             changeInput field value model
