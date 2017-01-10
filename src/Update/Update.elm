@@ -1,4 +1,4 @@
-module Update exposing (update, getContacts)
+module Update.Update exposing (update, getContacts)
 
 import Http
 import HttpBuilder

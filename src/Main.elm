@@ -2,7 +2,7 @@ module Main exposing (..)
 
 import Html exposing (Html)
 import Model exposing (Model, init)
-import Update exposing (update, getContacts)
+import Update.Update exposing (update, getContacts)
 import View.View exposing (view)
 import Subscriptions exposing (subscriptions)
 
