@@ -57,8 +57,8 @@ update msg model =
             model ! []
 
 
-updateSelectedContact : (Contact -> Contact) -> Model -> Model
-updateSelectedContact updateFunction model =
+updateContact : (Contact -> Contact) -> Model -> Model
+updateContact updateFunction model =
     let
         updatedContact =
             Maybe.map (updateFunction)
@@ -70,7 +70,7 @@ changeInput : Field -> String -> Model -> ( Model, Cmd Msg )
 changeInput field value model =
     case field of
         Firstname ->
-            (updateSelectedContact
+            (updateContact
                 (\c ->
                     { c | firstname = value }
                 )
@@ -79,7 +79,7 @@ changeInput field value model =
                 ! []
 
         Lastname ->
-            (updateSelectedContact
+            (updateContact
                 (\c ->
                     { c | lastname = value }
                 )
@@ -88,7 +88,7 @@ changeInput field value model =
                 ! []
 
         Phone ->
-            (updateSelectedContact
+            (updateContact
                 (\c ->
                     { c | phone = value }
                 )
