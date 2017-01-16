@@ -57,41 +57,23 @@ update msg model =
             model ! []
 
 
-updateContact : (Contact -> Contact) -> Model -> Model
-updateContact updateFunction model =
-    let
-        updatedContact =
-            Maybe.map (updateFunction)
-    in
-        { model | selectedContact = updatedContact model.selectedContact }
-
-
 changeInput : Field -> String -> Model -> ( Model, Cmd Msg )
 changeInput field value model =
-    case field of
-        Firstname ->
-            (updateContact
-                (\c ->
-                    { c | firstname = value }
-                )
-                model
-            )
-                ! []
+    case model.selectedContact of
+        Just contact ->
+            let
+                updated =
+                    case field of
+                        Firstname ->
+                            { contact | firstname = value }
 
-        Lastname ->
-            (updateContact
-                (\c ->
-                    { c | lastname = value }
-                )
-                model
-            )
-                ! []
+                        Lastname ->
+                            { contact | lastname = value }
 
-        Phone ->
-            (updateContact
-                (\c ->
-                    { c | phone = value }
-                )
-                model
-            )
-                ! []
+                        Phone ->
+                            { contact | phone = value }
+            in
+                ( { model | selectedContact = Just updated }, Cmd.none )
+
+        Nothing ->
+            ( model, Cmd.none )
