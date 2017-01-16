@@ -63,17 +63,22 @@ changeInput field value model =
         Just contact ->
             let
                 updated =
-                    case field of
-                        Firstname ->
-                            { contact | firstname = value }
-
-                        Lastname ->
-                            { contact | lastname = value }
-
-                        Phone ->
-                            { contact | phone = value }
+                    updateContact field value contact
             in
                 ( { model | selectedContact = Just updated }, Cmd.none )
 
         Nothing ->
             ( model, Cmd.none )
+
+
+updateContact : Field -> String -> Contact -> Contact
+updateContact field value contact =
+    case field of
+        Firstname ->
+            { contact | firstname = value }
+
+        Lastname ->
+            { contact | lastname = value }
+
+        Phone ->
+            { contact | phone = value }
