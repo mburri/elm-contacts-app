@@ -3,8 +3,8 @@ module View.ContactsList exposing (view)
 import Html exposing (Html, table, tbody, tr, td, text)
 import Html.Attributes exposing (value, class, type_)
 import Html.Events exposing (onClick, onInput)
-import Messages exposing (..)
-import Contact exposing (Contact)
+import Update.Messages exposing (..)
+import Model.Contact exposing (Contact)
 
 
 view : List Contact -> Html Msg

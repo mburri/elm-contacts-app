@@ -1,10 +1,10 @@
 module Update.ContactHttp exposing (getContacts, saveContact, deleteContact)
 
-import Contact exposing (Contact)
 import Http
 import HttpBuilder
-import Messages exposing (..)
-import Model exposing (Model)
+import Model.Model exposing (Model)
+import Model.Contact as Contact exposing (Contact)
+import Update.Messages exposing (..)
 
 
 getContacts : Cmd Msg

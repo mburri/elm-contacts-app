@@ -1,4 +1,4 @@
-module Contact exposing (..)
+module Model.Contact exposing (..)
 
 import Json.Encode as Encode
 import Json.Decode as Decode

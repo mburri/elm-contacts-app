@@ -2,9 +2,9 @@ module Update.Update exposing (update)
 
 import Http
 import HttpBuilder
-import Contact exposing (Contact)
-import Messages exposing (..)
-import Model exposing (Model)
+import Model.Contact as Contact exposing (Contact)
+import Model.Model exposing (Model)
+import Update.Messages exposing (..)
 import Update.ContactHttp as ContactHttp
 
 

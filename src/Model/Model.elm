@@ -1,6 +1,6 @@
-module Model exposing (Model, init)
+module Model.Model exposing (Model, init)
 
-import Contact exposing (Contact)
+import Model.Contact exposing (Contact)
 
 
 type alias Model =

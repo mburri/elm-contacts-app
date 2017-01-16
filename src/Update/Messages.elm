@@ -1,6 +1,6 @@
-module Messages exposing (..)
+module Update.Messages exposing (..)
 
-import Contact exposing (Contact)
+import Model.Contact exposing (Contact)
 
 
 type Field

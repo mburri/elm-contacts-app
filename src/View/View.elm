@@ -2,8 +2,8 @@ module View.View exposing (view)
 
 import Html exposing (Html, div, h1, text)
 import Html.Attributes exposing (class, type_)
-import Model exposing (Model)
-import Messages exposing (..)
+import Model.Model exposing (Model)
+import Update.Messages exposing (..)
 import View.Toolbar as Toolbar
 import View.ContactsList as ContactsList
 import View.ContactPanel as ContactPanel

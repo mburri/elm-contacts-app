@@ -3,8 +3,8 @@ module View.ContactPanel exposing (view)
 import Html exposing (..)
 import Html.Attributes exposing (value, class, type_)
 import Html.Events exposing (onClick, onInput)
-import Messages exposing (..)
-import Contact exposing (Contact)
+import Model.Contact exposing (Contact)
+import Update.Messages exposing (..)
 
 
 view : Maybe Contact -> Html Msg
