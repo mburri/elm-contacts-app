@@ -5,12 +5,12 @@ import Model exposing (Model, init)
 import Update.Update exposing (update)
 import View.View exposing (view)
 import Subscriptions exposing (subscriptions)
-import Update.ContactRequests as ContactRequests
+import Update.ContactHttp as ContactHttp
 
 
 main =
     Html.program
-        { init = init ContactRequests.getContacts
+        { init = init ContactHttp.getContacts
         , view = view
         , update = update
         , subscriptions = subscriptions

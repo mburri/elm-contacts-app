@@ -1,4 +1,4 @@
-module Update.ContactRequests exposing (getContacts, saveContact, deleteContact)
+module Update.ContactHttp exposing (getContacts, saveContact, deleteContact)
 
 import Contact exposing (Contact)
 import Http

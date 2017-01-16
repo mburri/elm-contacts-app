@@ -5,7 +5,7 @@ import HttpBuilder
 import Contact exposing (Contact)
 import Messages exposing (..)
 import Model exposing (Model)
-import Update.ContactRequests as ContactRequests
+import Update.ContactHttp as ContactHttp
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -21,10 +21,10 @@ update msg model =
             { model | selectedContact = Just contact } ! []
 
         SaveContact ->
-            ContactRequests.saveContact model
+            ContactHttp.saveContact model
 
         DeleteContact ->
-            ContactRequests.deleteContact model
+            ContactHttp.deleteContact model
 
         Cancel ->
             { model | selectedContact = Nothing } ! []
@@ -39,19 +39,19 @@ update msg model =
             model ! []
 
         PostContactSucceed ->
-            ( { model | selectedContact = Nothing }, ContactRequests.getContacts )
+            ( { model | selectedContact = Nothing }, ContactHttp.getContacts )
 
         PostContactFailed ->
             model ! []
 
         PutContactSucceed ->
-            ( { model | selectedContact = Nothing }, ContactRequests.getContacts )
+            ( { model | selectedContact = Nothing }, ContactHttp.getContacts )
 
         PutContactFailed ->
             model ! []
 
         DeleteContactSucceed ->
-            ( { model | selectedContact = Nothing }, ContactRequests.getContacts )
+            ( { model | selectedContact = Nothing }, ContactHttp.getContacts )
 
         DeleteContactFailed ->
             model ! []
