@@ -14,11 +14,16 @@ toolbarConfig =
     { addMessage = AddContact }
 
 
+contactsListConfig : ContactsList.Config Msg
+contactsListConfig =
+    ContactsList.config { selectMsg = Select }
+
+
 view : Model -> Html Msg
 view model =
     div [ class "container" ]
         [ div [ class "row " ] [ h1 [] [ text "Contacts" ] ]
         , ContactPanel.view model.selectedContact
         , Toolbar.view toolbarConfig
-        , (ContactsList.view model.contacts)
+        , (ContactsList.view contactsListConfig model.contacts)
         ]
