@@ -1,21 +1,25 @@
-module View.Toolbar exposing (view, Config)
+module View.Toolbar exposing (Config, config, view)
 
 import Html exposing (Html, div, button, text)
 import Html.Attributes exposing (value, class, type_)
 import Html.Events exposing (onClick, onInput)
 
 
-type alias Config msg =
-    { addMessage : msg
-    }
+type Config msg
+    = Config { addMessage : msg }
+
+
+config : { addMessage : msg } -> Config msg
+config { addMessage } =
+    Config { addMessage = addMessage }
 
 
 view : Config msg -> Html msg
-view config =
+view (Config { addMessage }) =
     div [ class "row" ]
         [ button
             [ class "button button-outline"
-            , onClick config.addMessage
+            , onClick addMessage
             ]
             [ text "Add" ]
         ]

@@ -11,7 +11,7 @@ import View.ContactPanel as ContactPanel
 
 toolbarConfig : Toolbar.Config Msg
 toolbarConfig =
-    { addMessage = AddContact }
+    Toolbar.config { addMessage = AddContact }
 
 
 contactsListConfig : ContactsList.Config Msg
